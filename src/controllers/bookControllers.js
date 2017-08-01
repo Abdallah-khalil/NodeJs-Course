@@ -22,13 +22,18 @@ var bookController = function (bookService, nav) {
         var url = 'mongodb://localhost:27017/libraryApp';
         mongodb.connect(url, function (err, db) {
             var collection = db.collection('books');
-            collection.findOne({ _id: id }, function (err, results) {
-                res.render('bookView', {
-                    title: 'Hello from ejs',
-                    nav: nav,
-                    book: results
+            collection.findOne({ _id: id },
+                function (err, results) {
+                    bookService.getBookById(results.bookId,
+                        function (err, book) {
+                            results.book = book;
+                            res.render('bookView', {
+                                title: 'Hello from ejs',
+                                nav: nav,
+                                book: results
+                            });
+                        });
                 });
-            });
         });
 
     };
@@ -36,7 +41,7 @@ var bookController = function (bookService, nav) {
 
     var middleware = function (req, res, next) {
         if (!req.user) {
-           // res.redirect('/');
+            // res.redirect('/');
         }
         next();
     };
